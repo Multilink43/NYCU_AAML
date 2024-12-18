@@ -107,15 +107,15 @@ inline void ConvPerChannel(
 */
 cfu_op0(6,input_offset,0);
               if (filter_input_depth == 3){
-                int8_t input_val_c1 = *((int8_t*)(input_data + Offset(input_shape, 0, in_y, in_x, 0)));
-                int8_t input_val_c2 = *((int8_t*)(input_data + Offset(input_shape, 0, in_y, in_x, 1)));
-                int8_t input_val_c3 = *((int8_t*)(input_data + Offset(input_shape, 0, in_y, in_x, 2)));
+                int8_t input_val_c1 = *((int8_t*)(input_data + Offset(input_shape, 0, in_y, in_x, 0 + 0 * filter_input_depth)));
+                int8_t input_val_c2 = *((int8_t*)(input_data + Offset(input_shape, 0, in_y, in_x, 1 + 0 * filter_input_depth)));
+                int8_t input_val_c3 = *((int8_t*)(input_data + Offset(input_shape, 0, in_y, in_x, 2 + 0 * filter_input_depth)));
                 uint32_t input_val = ((uint32_t)(uint8_t)input_val_c1 << 24) | ((uint32_t)(uint8_t)input_val_c2 << 16) | ((uint32_t)(uint8_t)input_val_c3 << 8) | 0x00;
 
 
-                int8_t filter_val_c1 = *((int8_t*)(filter_data + Offset(filter_shape, out_channel, filter_y, filter_x, 0 + 0 * filter_input_depth)));
-                int8_t filter_val_c2 = *((int8_t*)(filter_data + Offset(filter_shape, out_channel, filter_y, filter_x, 1 + 0 * filter_input_depth)));
-                int8_t filter_val_c3 = *((int8_t*)(filter_data + Offset(filter_shape, out_channel, filter_y, filter_x, 2 + 0 * filter_input_depth)));
+                int8_t filter_val_c1 = *((int8_t*)(filter_data + Offset(filter_shape, out_channel, filter_y, filter_x, 0)));
+                int8_t filter_val_c2 = *((int8_t*)(filter_data + Offset(filter_shape, out_channel, filter_y, filter_x, 1)));
+                int8_t filter_val_c3 = *((int8_t*)(filter_data + Offset(filter_shape, out_channel, filter_y, filter_x, 2)));
                 uint32_t filter_val = ((uint32_t)(uint8_t)filter_val_c1 << 24) | ((uint32_t)(uint8_t)filter_val_c2 << 16) | ((uint32_t)(uint8_t)filter_val_c3 << 8) | 0x00;
                 cfu_op0(2, input_val, filter_val);
                 cfu_op0(7, 0, 0);
