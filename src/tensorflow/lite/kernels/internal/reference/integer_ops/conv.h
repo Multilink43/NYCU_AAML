@@ -66,9 +66,9 @@ inline void ConvPerChannel(
   const int filter_height = filter_shape.Dims(1);
   const int filter_width = filter_shape.Dims(2);
   const int filter_input_depth = filter_shape.Dims(3);
-  //const int groups = input_depth / filter_input_depth;
+    //const int groups = input_depth / filter_input_depth;
   TFLITE_DCHECK_EQ(input_depth % filter_input_depth, 0);
-  //const int filters_per_group = output_depth / groups;
+    //const int filters_per_group = output_depth / groups;
   const int output_height = output_shape.Dims(1);
   const int output_width = output_shape.Dims(2);
 
@@ -80,9 +80,10 @@ inline void ConvPerChannel(
         for (int out_channel = 0; out_channel < output_depth; ++out_channel) {
           
           //auto group = out_channel / filters_per_group;
+          
           //int32_t acc=0;
           cfu_op0(1, 0, 0);
-          //cfu_op0(6, output_multiplier[out_channel], output_shift[out_channel]); 
+          
           for (int filter_y = 0; filter_y < filter_height; ++filter_y) {
             const int in_y = in_y_origin + dilation_height_factor * filter_y;
             for (int filter_x = 0; filter_x < filter_width; ++filter_x) {
@@ -112,17 +113,18 @@ cfu_op0(6,input_offset,0);
                 uint32_t input_val = ((uint32_t)(uint8_t)input_val_c1 << 24) | ((uint32_t)(uint8_t)input_val_c2 << 16) | ((uint32_t)(uint8_t)input_val_c3 << 8) | 0x00;
 
 
-                int8_t filter_val_c1 = *((int8_t*)(filter_data + Offset(filter_shape, out_channel, filter_y, filter_x, 0)));
-                int8_t filter_val_c2 = *((int8_t*)(filter_data + Offset(filter_shape, out_channel, filter_y, filter_x, 1)));
-                int8_t filter_val_c3 = *((int8_t*)(filter_data + Offset(filter_shape, out_channel, filter_y, filter_x, 2)));
+                int8_t filter_val_c1 = *((int8_t*)(filter_data + Offset(filter_shape, out_channel, filter_y, filter_x, 0 + 0 * filter_input_depth)));
+                int8_t filter_val_c2 = *((int8_t*)(filter_data + Offset(filter_shape, out_channel, filter_y, filter_x, 1 + 0 * filter_input_depth)));
+                int8_t filter_val_c3 = *((int8_t*)(filter_data + Offset(filter_shape, out_channel, filter_y, filter_x, 2 + 0 * filter_input_depth)));
                 uint32_t filter_val = ((uint32_t)(uint8_t)filter_val_c1 << 24) | ((uint32_t)(uint8_t)filter_val_c2 << 16) | ((uint32_t)(uint8_t)filter_val_c3 << 8) | 0x00;
                 cfu_op0(2, input_val, filter_val);
                 cfu_op0(7, 0, 0);
               }else{
                 for (int in_channel = 0; in_channel < input_depth; in_channel += 16) {
+                  
                     //uint32_t input_val, filter_val, pack_offset_data1, pack_offset_data2, input_offset_C, filter_offset_C;
                     uint32_t input_val, filter_val;
-                    input_val = *((uint32_t *)(input_data + Offset(input_shape, 0, in_y, in_x, in_channel)));
+                    input_val = *((uint32_t *)(input_data + Offset(input_shape, 0, in_y, in_x, in_channel + 0 * filter_input_depth)));
                     filter_val = *((uint32_t *)(filter_data + Offset(filter_shape, out_channel, filter_y, filter_x, in_channel)));
                     /*
                     pack_offset_data1 = ((uint32_t)(uint8_t)in_y << 24) | ((uint32_t)(uint8_t)input_width << 16) | ((uint32_t)(uint8_t)input_depth << 8) | ((uint32_t)(uint8_t)input_height); 
@@ -138,7 +140,7 @@ cfu_op0(6,input_offset,0);
                     */
                     cfu_op0(2, input_val, filter_val);
 
-                    input_val = *((uint32_t *)(input_data + Offset(input_shape, 0, in_y, in_x, in_channel+4)));
+                    input_val = *((uint32_t *)(input_data + Offset(input_shape, 0, in_y, in_x, in_channel+4 + 0 * filter_input_depth)));
                     filter_val = *((uint32_t *)(filter_data + Offset(filter_shape, out_channel, filter_y, filter_x, in_channel+4)));
                     /*
                     pack_offset_data1 = ((uint32_t)(uint8_t)in_y << 24) | ((uint32_t)(uint8_t)input_width << 16) | ((uint32_t)(uint8_t)input_depth << 8) | ((uint32_t)(uint8_t)input_height); 
@@ -155,7 +157,7 @@ cfu_op0(6,input_offset,0);
                     cfu_op0(3, input_val, filter_val);
 
 
-                    input_val = *((uint32_t *)(input_data + Offset(input_shape, 0, in_y, in_x, in_channel+8)));
+                    input_val = *((uint32_t *)(input_data + Offset(input_shape, 0, in_y, in_x, in_channel+8 + 0 * filter_input_depth)));
                     filter_val = *((uint32_t *)(filter_data + Offset(filter_shape, out_channel, filter_y, filter_x, in_channel+8)));
                     /*
                     pack_offset_data1 = ((uint32_t)(uint8_t)in_y << 24) | ((uint32_t)(uint8_t)input_width << 16) | ((uint32_t)(uint8_t)input_depth << 8) | ((uint32_t)(uint8_t)input_height); 
@@ -171,9 +173,7 @@ cfu_op0(6,input_offset,0);
                     */
                     cfu_op0(4, input_val, filter_val);
 
-
-
-                    input_val = *((uint32_t *)(input_data + Offset(input_shape, 0, in_y, in_x, in_channel+12)));
+                    input_val = *((uint32_t *)(input_data + Offset(input_shape, 0, in_y, in_x, in_channel+12 + 0 * filter_input_depth)));
                     /*
                     pack_offset_data1 = ((uint32_t)(uint8_t)in_y << 24) | ((uint32_t)(uint8_t)input_width << 16) | ((uint32_t)(uint8_t)input_depth << 8) | ((uint32_t)(uint8_t)input_height); 
                     pack_offset_data2 = ((uint32_t)(uint8_t)in_x << 24) | ((uint32_t)(uint8_t)(in_channel+12) << 16) | 0X00 | 0X00; 
